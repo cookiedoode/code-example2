@@ -1,0 +1,7 @@
+name: URL Alias Fix Module
+type: module
+description: "Create a json output for nodes without auto path generate and insert the custom alias back into the nodes"
+dependencies:
+package: URL Alias Fix
+core: 8.x
+core_version_requirement: ^8 || ^9

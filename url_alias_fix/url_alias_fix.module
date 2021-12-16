@@ -1,0 +1,73 @@
+<?php
+
+use Drupal\node\Entity\Node;
+use Drupal\menu_link_content\Entity\MenuLinkContent;
+
+//generate list of nodes with auto path generate unchecked
+function generate_url_alias_list(){
+    $query = \Drupal::entityQuery('node')
+        ->condition('status', 1); //published or not
+        // ->pager(70); //specify results to return
+    $nids = $query->execute();
+    $result = array();
+    // $test_nids = array("107871", "113586");
+    foreach ($nids as $nid) {
+        $node = \Drupal\node\Entity\Node::load($nid); 
+        if($node->path->pathauto != 1){
+            $result[] = array('nid'=>$nid, 'path'=>$node->path->alias);
+        }
+    }  
+    define("BASE_DIR", dirname(__FILE__));
+    $fp = fopen(BASE_DIR . '/response.json', 'w');
+    fwrite($fp, json_encode($result));
+    fclose($fp);
+    echo 'COMPLETED!'  . PHP_EOL;
+}
+
+//insert removed custom url and save
+function reinsert_custom_url_alias(){
+    define("BASE_DIR", dirname(__FILE__));
+    $nodes = json_decode(file_get_contents(BASE_DIR . '/response.json'), true);
+    foreach($nodes as $node){
+        $nodeToUpdate = \Drupal\node\Entity\Node::load($node['nid']); 
+        $nodeToUpdate->path->alias = $node['path'];
+        $nodeToUpdate->save();
+        var_dump($node['nid'] . '-' . $node['path']);
+    }
+}
+
+// //generate list of nodes with empty menu title
+// function generate_url_alias_list2(){
+//     $query = \Drupal::entityQuery('node')
+//         ->condition('status', 1) //published or not
+//         ->pager(100); //specify results to return
+//     $nids = $query->execute();
+//     $result2 = array();
+//     $test_nids = array("136126", "79901", "103961");
+
+//     foreach ($test_nids as $nid) {
+//         $node = \Drupal\node\Entity\Node::load($nid); 
+//         $system_uri = 'entity:node/' . $nid;
+        
+//         $query = \Drupal::entityQuery('menu_link_content')
+//         ->condition('link.uri', 'entity:node/136126');
+
+//         $result = $query->execute();
+//         $menu_link_id = (!empty($result)) ? reset($result) : FALSE;
+//         var_dump($result);
+//         // if ($menu_link_id) {
+//         //     $menu_link = MenuLinkContent::load($menu_link_id);
+//         //     $menu_link_title = $menu_link->getTitle();
+//         //     var_dump($menu_link_title);
+//         //     if(!$menu_link_title){
+//         //         // $result2[] = array('nid'=>$nid, 'title'=>$node->title->value);
+//         //         echo('test');
+//         //     }
+//         // }
+//     }  
+//     define("BASE_DIR", dirname(__FILE__));
+//     $fp = fopen(BASE_DIR . '/response2.json', 'w');
+//     fwrite($fp, json_encode($result2));
+//     fclose($fp);
+//     echo 'COMPLETED!'  . PHP_EOL;
+// }
