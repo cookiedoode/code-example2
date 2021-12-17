@@ -9,7 +9,7 @@ The solution:
 - The second function in the module will use the response.json file and reinsert the custom url aliases according to their nid. This second function should be run after the url alias table has been cleared.
 
 Instruction:
-- Install and activate the module
+- Install and activate the module in a Drupal 8 or Drupal 9
 - Run the functions using drush in the environment:
     - drush php-eval "generate_url_alias_list()"
     - drush php-eval "reinsert_custom_url_alias()"  
